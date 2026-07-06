@@ -1,1 +1,5 @@
-testtest
+Add 0706 project charter
+Update requirements package
+Revise SRS based on feedback
+Add prototype links and usability notes
+Add final package
