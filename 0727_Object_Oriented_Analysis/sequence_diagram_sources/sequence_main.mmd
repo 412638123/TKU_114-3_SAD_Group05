@@ -26,6 +26,10 @@ Controller->>Application: submit(validatedInput, revision=1)
 activate Application
 Application-->>Controller: ActivityApplication(status=待審核)
 deactivate Application
+Controller->>Booking: reserve(application)
+activate Booking
+Booking-->>Controller: VenueBooking
+deactivate Booking
 Controller-->>Form: CreateResult(created=true)
 deactivate Controller
 Form-->>Officer: 顯示成功與「待審核」

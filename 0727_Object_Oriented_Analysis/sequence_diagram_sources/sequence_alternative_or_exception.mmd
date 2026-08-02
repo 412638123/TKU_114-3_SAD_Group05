@@ -14,19 +14,28 @@ Review->>Application: validateTransition(待審核, target)
 
 alt targetStatus = 已核准
   Review->>Application: changeStatus(已核准, "")
-  Application-->>ReviewUI: 已核准；顯示場地行程與活動資訊
+  Application-->>Review: ActivityApplication(status=已核准)
+  Review-->>ReviewUI: 顯示審核結果
 else targetStatus = 待補件 and note 不為空
   Review->>Application: changeStatus(待補件, note)
-  Application-->>Form: 補件通知與原因
+  Application-->>Review: ActivityApplication(status=待補件)
+  Review-->>Form: 顯示補件原因
+else targetStatus = 已退回 and note 不為空
+  Review->>Application: changeStatus(已退回, note)
+  Application-->>Review: ActivityApplication(status=已退回)
+  Review-->>ReviewUI: 顯示退回結果
 else targetStatus = 待補件或已退回 and note 為空
   Review-->>ReviewUI: reject(要求補件或退回時必須填寫原因)
-  ReviewUI-->>Staff: 狀態維持待審核
+  ReviewUI-->>Staff: 顯示原因必填錯誤；狀態維持待審核
 end
 
-loop status = 待補件 and 使用者繼續修改
+loop status = 待補件、尚未取消且尚未成功重送
   Officer->>Form: 修改補件資料
   Form->>Controller: resubmit(id, revisedRequest)
   Controller->>Application: validate + clear note + revision++
-  Application-->>Form: ActivityApplication(status=待審核)
+  Application-->>Controller: ActivityApplication(status=待審核)
+  Controller-->>Form: CreateResult(resubmitted=true)
   Form-->>Officer: 顯示重送成功，等待下一次審核
 end
+
+Note over ReviewUI,Controller: FR-08 的狀態集合、原因規則與終止語意仍待確認

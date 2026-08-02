@@ -27,7 +27,7 @@ class ApplicationController {
   -Long nextId
   +create(request) CreateResult
   +validate(request) ValidatedInput
-  +findConflict(request) VenueBooking
+  +findConflictingBooking(criteria) VenueBooking
   +resubmit(id, request) CreateResult
 }
 
@@ -78,7 +78,6 @@ class Venue {
   -List equipment
   +isValid() Boolean
   +findBookings(date) List~VenueBooking~
-  +supportsCapacity(number) Boolean
 }
 
 class SystemUser {
@@ -95,6 +94,7 @@ ApplicationFormBoundary "1" --> "1" ApplicationController : 送出申請／呈�
 ReviewCenterBoundary "1" --> "1" ReviewController : 送出審核／呈現結果
 ApplicationController "1" --> "0..*" ActivityApplication : 建立／查詢／重新送出
 ReviewController "1" --> "0..*" ActivityApplication : 審核／狀態轉移
-ActivityApplication "1" *-- "0..1" VenueBooking : 組合
+ActivityApplication "1" --> "0..1" VenueBooking : 對應場地借用
 Venue "1" --> "0..*" VenueBooking : 提供借用場地
-SystemUser "1" ..> "0..*" ActivityApplication : 以 role 提出或審核
+SystemUser "1" --> "0..*" ActivityApplication : 提出
+SystemUser "0..1" --> "0..*" ActivityApplication : 審核（FR-08 待確認）

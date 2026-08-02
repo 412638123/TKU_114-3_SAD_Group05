@@ -2,7 +2,7 @@
 
 | 候選項目                                | 來源編號                                            | 可能責任                                   | 保留／合併／移除 | 判斷理由                                                                           |
 | --------------------------------------- | --------------------------------------------------- | ------------------------------------------ | ---------------- | ---------------------------------------------------------------------------------- |
-| 活動申請（ActivityApplication）         | FR-01、FR-05～FR-08；UC-01、UC-03、UC-04；D1；EC-01 | 保存申請資料、維護審核狀態與補件版本       | 保留             | 是核心業務物件，具有獨立識別碼與「建立中、待審核、待補件、已核准、已退回」生命週期 |
+| 活動申請（ActivityApplication）         | FR-01、FR-05～FR-08；UC-01、UC-03、UC-04；D1；EC-01 | 保存申請資料、維護審核狀態與補件版本       | 保留             | 是核心業務物件，具有獨立識別碼；已確認初始狀態為待審核，其餘審核狀態待確認 |
 | 場地借用（VenueBooking）                | FR-02～FR-04；UC-02；D2；EC-02                      | 保存場地時段、判斷同場地時段是否重疊       | 保留             | 是活動申請與場地之間的關聯物件，承擔衝突檢查所需日期與時段資料                     |
 | 場地（Venue）                           | FR-01～FR-04、FR-09；EC-08；REL-03、REL-05          | 提供有效場地資料、關聯場地借用紀錄         | 保留             | 具有場地編號、名稱、容量與位置，不是單一表單欄位                                   |
 | 系統使用者（SystemUser）                | DOC-01；D3；EC-03；REL-01、REL-04                   | 保存使用者身分與角色、判斷申請或審核權限   | 保留             | ERD 已定義使用者及角色；正式 SSO 未實作，但角色責任仍需保留於分析模型              |
@@ -20,7 +20,7 @@
 | 類別名稱   | ActivityApplication（活動申請）                                                                           |
 | 類型       | Entity（實體）                                                                                            |
 | 主要責任 1 | 保存活動名稱、日期、起訖時間、場地、說明與申請識別碼                                                      |
-| 主要責任 2 | 維護申請狀態、審核原因與補件版本，拒絕不合法的狀態轉移                                                    |
+| 主要責任 2 | 依已確認規則維護申請狀態、審核原因與補件版本；未確認的轉移不得自行決定                                      |
 | 重要屬性   | applicationId、activityName、date、startTime、endTime、venueId、description、status、reviewNote、revision |
 | 主要操作   | submit()、changeStatus(targetStatus, reviewNote)、resubmit(revisedData)                                   |
 | 協作者     | ApplicationController、ReviewController、VenueBooking、SystemUser                                         |
@@ -48,11 +48,11 @@
 | 主要責任 1 | 保存有效場地的編號、名稱、容量、位置與設備摘要                           |
 | 主要責任 2 | 提供場地借用紀錄與可用性查詢所需的穩定場地資料                           |
 | 重要屬性   | venueId、venueName、capacity、location、equipment                        |
-| 主要操作   | isValid()、findBookings(date)、supportsCapacity(expectedPeople)          |
+| 主要操作   | isValid()、findBookings(date)                                             |
 | 協作者     | VenueBooking、ActivityApplication、ApplicationController                 |
 | 來源編號   | FR-01～FR-04、FR-09；EC-08；REL-03、REL-05                               |
 | 保留理由   | 場地具有獨立識別與基本資料，可在沒有任何申請時存在，不是場地下拉選單本身 |
-| 待確認問題 | 設備清單與特殊設備借用是否納入本期資料模型                               |
+| 待確認問題 | 容量是否形成阻擋規則、設備清單與特殊設備借用是否納入本期資料模型         |
 
 | 欄位       | 內容                                                                         |
 | ---------- | ---------------------------------------------------------------------------- |
@@ -61,7 +61,7 @@
 | 主要責任 1 | 保存使用者帳號、姓名、所屬社團與角色                                         |
 | 主要責任 2 | 提供角色是否可提出申請或執行審核的判斷依據                                   |
 | 重要屬性   | userId、name、clubId、role                                                   |
-| 主要操作   | canSubmitApplication()、canReviewApplication()                               |
+| 主要操作   | canSubmitApplication()、canReviewApplication()（權限矩陣確認後才可實作）     |
 | 協作者     | ActivityApplication、ApplicationController、ReviewController                 |
 | 來源編號   | DOC-01；D3；EC-03；REL-01、REL-04                                            |
 | 保留理由   | ERD 已有穩定主鍵與角色資料，支援申請人及審核人關係；不將角色名稱誤建成子類別 |
@@ -97,14 +97,14 @@
 | ---------- | ------------------------------------------------------------------------------------------- |
 | 類別名稱   | ApplicationController（申請流程控制）                                                       |
 | 類型       | Control（控制）                                                                             |
-| 主要責任 1 | 協調必填與時間驗證、場地衝突檢查及申請建立                                                  |
+| 主要責任 1 | 協調必填與時間驗證、取得既有借用並委託 VenueBooking 判斷衝突及建立申請                    |
 | 主要責任 2 | 協調待補件申請的修改、重新送出與版本增加                                                    |
 | 重要屬性   | applications、nextApplicationId                                                             |
-| 主要操作   | create(request)、validate(request)、findConflict(request)、resubmit(id, request)、findAll() |
+| 主要操作   | create(request)、validate(request)、findConflictingBooking(criteria)、resubmit(id, request)、findAll() |
 | 協作者     | ApplicationFormBoundary、ActivityApplication、VenueBooking、Venue                           |
 | 來源編號   | FR-01～FR-07；UC-01～UC-04；DFD 1.0～3.0；`ApplicationService`                            |
 | 保留理由   | 集中單一使用案例流程的協調工作，避免邊界直接操作實體集合                                    |
-| 待確認問題 | 衝突判斷應由 VenueBooking 領域操作或獨立規則服務承擔，實作重構時需確認                      |
+| 待確認問題 | 實作重構時如何讓前端與 Java 使用同一組已確認的時段邊界案例                                |
 
 | 欄位       | 內容                                                                                             |
 | ---------- | ------------------------------------------------------------------------------------------------ |
@@ -117,4 +117,4 @@
 | 協作者     | ReviewCenterBoundary、ActivityApplication、SystemUser                                            |
 | 來源編號   | FR-08；UC-05、UC-06；DFD 4.0、5.0；`updateStatus`                                              |
 | 保留理由   | 將審核流程協調與狀態限制從畫面及資料記錄中分離，便於驗證非法轉移                                 |
-| 待確認問題 | `已退回` 是否為終止狀態；目前需求只確認本次採終止處理                                          |
+| 待確認問題 | FR-08、核准／補件／退回狀態集合及 `已退回` 是否為終止狀態                                    |
