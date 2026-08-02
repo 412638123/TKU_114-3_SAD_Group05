@@ -1,0 +1,33 @@
+sequenceDiagram
+autonumber
+actor Officer as 社團幹部
+participant Form as ApplicationFormBoundary<br/>&lt;&lt;Boundary&gt;&gt;
+participant Controller as ApplicationController<br/>&lt;&lt;Control&gt;&gt;
+participant Venue as Venue<br/>&lt;&lt;Entity&gt;&gt;
+participant Booking as VenueBooking<br/>&lt;&lt;Entity&gt;&gt;
+participant Application as ActivityApplication<br/>&lt;&lt;Entity&gt;&gt;
+
+Officer->>Form: 開啟並填寫活動申請(data)
+activate Form
+Officer->>Form: 檢查並送出申請
+Form->>Controller: create(ApplicationRequest)
+activate Controller
+Controller->>Controller: validate(request)
+Note right of Controller: 必填完整且 endTime &gt; startTime
+Controller->>Venue: isValid(venueId)
+activate Venue
+Venue-->>Controller: Venue
+deactivate Venue
+Controller->>Booking: overlaps(venueId, date, start, end)
+activate Booking
+Booking-->>Controller: false（無衝突）
+deactivate Booking
+Controller->>Application: submit(validatedInput, revision=1)
+activate Application
+Application-->>Controller: ActivityApplication(status=待審核)
+deactivate Application
+Controller-->>Form: CreateResult(created=true)
+deactivate Controller
+Form-->>Officer: 顯示成功與「待審核」
+deactivate Form
+Note over Venue,Application: 後置條件：建立 revision=1 的申請與場地借用，狀態為待審核

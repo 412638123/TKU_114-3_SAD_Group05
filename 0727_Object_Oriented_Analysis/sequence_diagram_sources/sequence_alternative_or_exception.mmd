@@ -1,0 +1,32 @@
+sequenceDiagram
+autonumber
+actor Staff as 課外活動組老師
+actor Officer as 社團幹部
+participant ReviewUI as ReviewCenterBoundary<br/>&lt;&lt;Boundary&gt;&gt;
+participant Review as ReviewController<br/>&lt;&lt;Control&gt;&gt;
+participant Application as ActivityApplication<br/>&lt;&lt;Entity&gt;&gt;
+participant Form as ApplicationFormBoundary<br/>&lt;&lt;Boundary&gt;&gt;
+participant Controller as ApplicationController<br/>&lt;&lt;Control&gt;&gt;
+
+Staff->>ReviewUI: 查看待審核申請
+ReviewUI->>Review: review(id, targetStatus, note)
+Review->>Application: validateTransition(待審核, target)
+
+alt targetStatus = 已核准
+  Review->>Application: changeStatus(已核准, "")
+  Application-->>ReviewUI: 已核准；顯示場地行程與活動資訊
+else targetStatus = 待補件 and note 不為空
+  Review->>Application: changeStatus(待補件, note)
+  Application-->>Form: 補件通知與原因
+else targetStatus = 待補件或已退回 and note 為空
+  Review-->>ReviewUI: reject(要求補件或退回時必須填寫原因)
+  ReviewUI-->>Staff: 狀態維持待審核
+end
+
+loop status = 待補件 and 使用者繼續修改
+  Officer->>Form: 修改補件資料
+  Form->>Controller: resubmit(id, revisedRequest)
+  Controller->>Application: validate + clear note + revision++
+  Application-->>Form: ActivityApplication(status=待審核)
+  Form-->>Officer: 顯示重送成功，等待下一次審核
+end

@@ -1,0 +1,100 @@
+classDiagram
+direction TB
+
+class ApplicationFormBoundary {
+  <<Boundary>>
+  -FormState formState
+  -Long editingId
+  -String message
+  +submitApplication(formData) Result
+  +startSupplement(application) void
+  +showResult(result) void
+}
+
+class ReviewCenterBoundary {
+  <<Boundary>>
+  -List pendingApplications
+  -Map reviewDrafts
+  -String staffMessage
+  +review(id, status, note) Result
+  +showPendingApplications() void
+  +showReviewError(message) void
+}
+
+class ApplicationController {
+  <<Control>>
+  -List~ActivityApplication~ applications
+  -Long nextId
+  +create(request) CreateResult
+  +validate(request) ValidatedInput
+  +findConflict(request) VenueBooking
+  +resubmit(id, request) CreateResult
+}
+
+class ReviewController {
+  <<Control>>
+  -Map allowedTransitions
+  -Rule reviewPolicy
+  +review(id, target, note) ActivityApplication
+  +validateTransition(current, target) Boolean
+  +validateReviewNote(note) Boolean
+}
+
+class ActivityApplication {
+  <<Entity>>
+  -Long applicationId
+  -String activityName
+  -Date date
+  -Time startTime
+  -Time endTime
+  -String venueId
+  -ApplicationStatus status
+  -String reviewNote
+  -Integer revision
+  +submit() void
+  +changeStatus(target, note) void
+  +resubmit(data) void
+}
+
+class VenueBooking {
+  <<Entity>>
+  -Long bookingId
+  -String venueId
+  -Long applicationId
+  -Date bookingDate
+  -Time startTime
+  -Time endTime
+  +overlaps(venue, date, start, end) Boolean
+  +reserve(application) void
+  +release() void
+}
+
+class Venue {
+  <<Entity>>
+  -String venueId
+  -String venueName
+  -Integer capacity
+  -String location
+  -List equipment
+  +isValid() Boolean
+  +findBookings(date) List~VenueBooking~
+  +supportsCapacity(number) Boolean
+}
+
+class SystemUser {
+  <<Entity>>
+  -String userId
+  -String name
+  -String clubId
+  -UserRole role
+  +canSubmitApplication() Boolean
+  +canReviewApplication() Boolean
+}
+
+ApplicationFormBoundary "1" --> "1" ApplicationController : 送出申請／呈現結果
+ReviewCenterBoundary "1" --> "1" ReviewController : 送出審核／呈現結果
+ApplicationController "1" --> "0..*" ActivityApplication : 建立／查詢／重新送出
+ReviewController "1" --> "0..*" ActivityApplication : 審核／狀態轉移
+ActivityApplication "1" *-- "0..1" VenueBooking : 組合
+Venue "1" --> "0..*" VenueBooking : 提供借用場地
+SystemUser "1" ..> "0..*" ActivityApplication : 以 role 提出或審核
