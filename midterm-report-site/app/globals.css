@@ -785,7 +785,7 @@ p {
 .scenario-guide {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   margin-bottom: 24px;
 }
 
@@ -967,6 +967,17 @@ p {
   padding: 9px 13px;
 }
 
+.prototype-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.prototype-tools button[aria-pressed="true"] {
+  background: white;
+  color: var(--navy);
+}
+
 .prototype-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1038,6 +1049,21 @@ p {
   box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.13);
 }
 
+.prototype-grid input[aria-invalid="true"],
+.prototype-grid textarea[aria-invalid="true"] {
+  border-color: var(--coral-dark);
+  box-shadow: 0 0 0 3px rgba(231, 111, 81, 0.12);
+}
+
+.field-error {
+  color: #8f321e;
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
 .prototype-grid textarea {
   resize: vertical;
 }
@@ -1055,6 +1081,24 @@ p {
   margin-top: 8px;
   padding: 16px 18px;
   width: 100%;
+}
+
+.submit-button:disabled,
+.cancel-edit-button:disabled,
+.review-actions button:disabled,
+.prototype-grid input:disabled,
+.prototype-grid textarea:disabled,
+.review-decision textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.submit-state-hint {
+  color: var(--muted);
+  display: block;
+  font-size: 10px;
+  line-height: 1.55;
+  margin-top: 8px;
 }
 
 .cancel-edit-button {
@@ -1123,6 +1167,76 @@ p {
 .system-message.error > span {
   background: var(--coral);
   color: white;
+}
+
+.system-message.loading {
+  background: #fff4d4;
+  color: #71530d;
+}
+
+.system-message.loading > span {
+  animation: processing-pulse 0.9s ease-in-out infinite alternate;
+  background: #f5c65c;
+  color: #4f3908;
+}
+
+@keyframes processing-pulse {
+  from {
+    opacity: 0.45;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.permission-denied {
+  align-items: center;
+  background: #fff8f4;
+  display: flex;
+  flex-direction: column;
+  min-height: 560px;
+  padding: clamp(48px, 8vw, 100px) 24px;
+  text-align: center;
+}
+
+.permission-denied > span {
+  align-items: center;
+  background: var(--coral);
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  font-size: 24px;
+  font-weight: 900;
+  height: 64px;
+  justify-content: center;
+  margin-bottom: 24px;
+  width: 64px;
+}
+
+.permission-denied h3 {
+  color: var(--navy);
+  font-size: clamp(28px, 4vw, 42px);
+  margin: 10px 0 14px;
+}
+
+.permission-denied > p:not(.kicker) {
+  color: var(--muted);
+  line-height: 1.75;
+  margin: 0;
+  max-width: 620px;
+}
+
+.permission-denied button {
+  background: var(--navy);
+  border: 0;
+  border-radius: 999px;
+  color: white;
+  cursor: pointer;
+  font-weight: 900;
+  margin-top: 28px;
+  padding: 13px 20px;
 }
 
 .record-summary {
@@ -1485,6 +1599,14 @@ p {
   box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.12);
 }
 
+.review-decision label > small {
+  color: var(--muted);
+  display: block;
+  font-size: 9px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
 .review-card-main p {
   color: #4f606c;
   font-size: 12px;
@@ -1655,6 +1777,15 @@ p {
 .student-filters input:focus,
 .student-filters select:focus {
   border-color: var(--teal);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid #f5c65c;
+  outline-offset: 3px;
 }
 
 .student-activity-card {
@@ -2208,6 +2339,15 @@ footer small {
     gap: 12px;
   }
 
+  .prototype-tools {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .prototype-tools button {
+    flex: 1 1 150px;
+  }
+
   .prototype-bar > div {
     align-items: flex-start;
     flex-direction: column;
@@ -2300,5 +2440,14 @@ footer small {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Prototype from "./Prototype";
 
 const requirements = [
@@ -102,7 +103,7 @@ export default function Home() {
           <div className="eyebrow">
             <span>系統分析與設計</span>
             <span>Group05</span>
-            <span>115 / 07 / 20</span>
+            <span>115 / 07 / 28–29</span>
           </div>
           <h1>
             讓活動申請
@@ -110,7 +111,7 @@ export default function Home() {
             <em>不再卡在人工比對。</em>
           </h1>
           <p className="hero-lead">
-            以社團幹部的活動與場地申請為核心，將資料檢查、場地衝突判斷、申請建檔與狀態查詢整合成一致流程。
+            將既有需求與模型轉成可操作介面，完整驗證建立申請、處理場地衝突，以及補件與審核三個核心任務。
           </p>
           <div className="hero-actions">
             <a className="button button-primary" href="#prototype">
@@ -121,21 +122,21 @@ export default function Home() {
             </a>
           </div>
           <p className="honesty-note">
-            本頁是依 0720 文件建立的瀏覽器內可操作原型；資料不會寫入正式資料庫。FR-08～FR-10
-            僅依現有分析內容示範，未確認的審核、通知與驗收規則不視為正式完成。
+            本頁依 0727 模型基準重構，使用匿名假資料並保存在瀏覽器記憶體。FR-01～FR-07
+            為核心範圍；FR-08～FR-10 僅作原型示範，未確認規則不視為正式完成。
           </p>
         </div>
         <div className="hero-system" aria-label="核心流程摘要">
           <div className="system-topline">
-            <span>CORE FLOW / UC-01—04</span>
+            <span>UI / UX / SDD v1</span>
             <span className="live-dot">可操作</span>
           </div>
           <div className="flow-stack">
             {[
-              ["01", "填寫活動資料", "FR-01／02"],
-              ["02", "檢查場地衝突", "FR-03／04"],
-              ["03", "建立申請紀錄", "FR-05"],
-              ["04", "顯示待審核狀態", "FR-06／07"],
+              ["01", "建立有效申請", "TF-01"],
+              ["02", "處理場地衝突", "TF-02"],
+              ["03", "補件重新送出", "TF-03"],
+              ["04", "審核狀態回饋", "ST-01～06"],
             ].map(([number, title, req], index) => (
               <div className="flow-row" key={number}>
                 <span className="flow-number">{number}</span>
@@ -147,9 +148,9 @@ export default function Home() {
           </div>
           <div className="system-footer">
             <span>輸入</span>
-            <strong>活動、日期、時間、場地</strong>
+            <strong>需求、模型、匿名測試資料</strong>
             <span>輸出</span>
-            <strong>待審核申請</strong>
+            <strong>可觀察畫面與狀態</strong>
           </div>
         </div>
       </section>
@@ -401,7 +402,7 @@ export default function Home() {
               {traceRows.map((row) => (
                 <tr key={row[0]}>
                   {row.map((cell, index) => (
-                    <td key={cell} data-label={["需求", "使用案例", "目標流程", "畫面或操作", "驗收條件"][index]}>
+                    <td key={`${row[0]}-${index}`} data-label={["需求", "使用案例", "目標流程", "畫面或操作", "驗收條件"][index]}>
                       {cell}
                     </td>
                   ))}
@@ -427,7 +428,7 @@ export default function Home() {
           <span className="section-index">06</span>
           <div>
             <p className="kicker">目前限制與下一步</p>
-            <h2>誠實標示未完成，讓期末工作有明確順序。</h2>
+            <h2>完成可測試原型，誠實保留真人測試與未確認規則。</h2>
           </div>
         </div>
 
@@ -450,7 +451,7 @@ export default function Home() {
           <article>
             <span>04</span>
             <h3>需求與測試證據</h3>
-            <p>FR-08～FR-10 仍有來源或驗收不足；MAT-01～MAT-06 應在影片中重新操作確認。</p>
+            <p>功能與狀態測試可由程式驗證；兩位測試者的觀察、原話、問題頻率及重測結果必須實際執行後填寫。</p>
           </article>
         </div>
 

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Group05 畫面流程</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f7f2e8; color: #10263f; font-family: "Microsoft JhengHei", sans-serif; }
+    main { width: 1400px; min-height: 900px; padding: 56px 64px; }
+    header { display: flex; justify-content: space-between; align-items: end; border-bottom: 4px solid #e76f51; padding-bottom: 22px; }
+    h1 { font-size: 40px; margin: 0; }
+    header p { color: #52616c; font-size: 18px; margin: 0; }
+    .flow { display: grid; gap: 18px; margin-top: 30px; }
+    .lane { background: white; border: 1px solid #d8dedf; border-radius: 18px; display: grid; grid-template-columns: 190px 1fr; overflow: hidden; }
+    .lane-title { background: #10263f; color: white; display: flex; flex-direction: column; justify-content: center; padding: 26px; }
+    .lane-title b { color: #6fd0c4; font-size: 15px; margin-bottom: 8px; }
+    .lane-title span { font-size: 22px; font-weight: 800; }
+    .steps { align-items: center; display: grid; gap: 18px; grid-template-columns: repeat(7, minmax(0, 1fr)); padding: 22px; }
+    .step { align-items: center; background: #edf5f3; border: 2px solid #2a9d8f; border-radius: 12px; display: flex; font-size: 15px; font-weight: 800; justify-content: center; min-height: 72px; padding: 10px; text-align: center; }
+    .step.error { background: #fbe9e4; border-color: #e76f51; color: #8f321e; }
+    .step.result { background: #10263f; border-color: #10263f; color: white; }
+    .arrow { color: #e76f51; font-size: 30px; font-weight: 900; text-align: center; }
+    .legend { display: flex; gap: 24px; margin-top: 26px; }
+    .legend span { align-items: center; display: flex; font-size: 14px; gap: 8px; }
+    .legend i { border-radius: 4px; display: inline-block; height: 18px; width: 18px; }
+    .normal { background: #edf5f3; border: 2px solid #2a9d8f; }
+    .exception { background: #fbe9e4; border: 2px solid #e76f51; }
+    .outcome { background: #10263f; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>畫面流程｜三個核心任務</h1>
+      <p>Group05 · 0728–0729 UI／UX 原型</p>
+    </header>
+    <section class="flow" aria-label="三個核心任務畫面流程">
+      <article class="lane">
+        <div class="lane-title"><b>TF-01</b><span>建立活動申請</span></div>
+        <div class="steps">
+          <div class="step">社團幹部畫面</div><div class="arrow">→</div>
+          <div class="step">建立申請表</div><div class="arrow">→</div>
+          <div class="step">送出處理中<br>操作停用</div><div class="arrow">→</div>
+          <div class="step result">我的申請<br>待審核</div>
+        </div>
+      </article>
+      <article class="lane">
+        <div class="lane-title"><b>TF-02</b><span>處理場地衝突</span></div>
+        <div class="steps">
+          <div class="step">建立申請表</div><div class="arrow">→</div>
+          <div class="step error">場地衝突訊息</div><div class="arrow">→</div>
+          <div class="step">修改場地或時間</div><div class="arrow">→</div>
+          <div class="step result">重新送出成功</div>
+        </div>
+      </article>
+      <article class="lane">
+        <div class="lane-title"><b>TF-03</b><span>補件與審核</span></div>
+        <div class="steps">
+          <div class="step">審核中心</div><div class="arrow">→</div>
+          <div class="step error">要求補件＋原因</div><div class="arrow">→</div>
+          <div class="step">補件修改重送</div><div class="arrow">→</div>
+          <div class="step result">再次審核<br>已核准</div>
+        </div>
+      </article>
+    </section>
+    <div class="legend" aria-label="圖例">
+      <span><i class="normal"></i>主要操作</span>
+      <span><i class="exception"></i>替代／錯誤</span>
+      <span><i class="outcome"></i>可觀察終點</span>
+    </div>
+  </main>
+</body>
+</html>

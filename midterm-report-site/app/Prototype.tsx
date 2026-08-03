@@ -1,6 +1,11 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import {
+  findVenueConflict,
+  validateApplication,
+  validateReviewTransition,
+} from "./prototype-domain.mjs";
 
 type ApplicationStatus = "待審核" | "待補件" | "已核准" | "已退回";
 type Role = "club" | "staff" | "venue" | "student";
@@ -34,6 +39,9 @@ type Notification = {
   message: string;
 };
 
+type FieldErrors = Partial<Record<keyof FormState, string>>;
+type MessageTone = "success" | "error" | "info" | "loading";
+
 const emptyForm: FormState = {
   activityName: "",
   date: "",
@@ -42,6 +50,37 @@ const emptyForm: FormState = {
   venue: "",
   description: "",
 };
+
+const anonymousTestApplications: Application[] = [
+  {
+    id: 1001,
+    activityName: "攝影社迎新工作坊",
+    date: "2026-08-15",
+    startTime: "14:00",
+    endTime: "16:00",
+    venue: "活動中心 R201",
+    description: "匿名測試資料：提供場地衝突與審核任務使用。",
+    status: "待審核",
+    reviewNote: "",
+    revision: 1,
+  },
+  {
+    id: 1002,
+    activityName: "吉他社成果發表",
+    date: "2026-08-20",
+    startTime: "18:00",
+    endTime: "20:00",
+    venue: "文錙音樂廳",
+    description: "匿名測試資料：提供場地與活動查詢畫面使用。",
+    status: "已核准",
+    reviewNote: "",
+    revision: 1,
+  },
+];
+
+function waitForFeedback() {
+  return new Promise((resolve) => window.setTimeout(resolve, 450));
+}
 
 const roles: Array<{
   id: Role;
@@ -64,21 +103,25 @@ function statusClass(status: ApplicationStatus) {
 export default function Prototype() {
   const [activeRole, setActiveRole] = useState<Role>("club");
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [editingId, setEditingId] = useState<number | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [reviewDrafts, setReviewDrafts] = useState<Record<number, string>>({});
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [studentQuery, setStudentQuery] = useState("");
   const [studentVenue, setStudentVenue] = useState("全部場地");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reviewingId, setReviewingId] = useState<number | null>(null);
+  const [showPermissionDenied, setShowPermissionDenied] = useState(false);
   const [message, setMessage] = useState<{
-    tone: "success" | "error" | "info";
+    tone: MessageTone;
     text: string;
   }>({
     tone: "info",
     text: "尚未建立申請。請輸入資料，現場驗證核心流程。",
   });
   const [staffMessage, setStaffMessage] = useState<{
-    tone: "success" | "error" | "info";
+    tone: MessageTone;
     text: string;
   }>({
     tone: "info",
@@ -134,44 +177,43 @@ export default function Prototype() {
 
   function updateField(field: keyof FormState, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
+    setFieldErrors((current) => ({ ...current, [field]: undefined }));
   }
 
-  function submitApplication(event: FormEvent<HTMLFormElement>) {
+  async function submitApplication(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!canSubmit) {
+    if (isSubmitting) return;
+
+    const validationErrors = validateApplication(form) as FieldErrors;
+    if (Object.keys(validationErrors).length > 0) {
+      setFieldErrors(validationErrors);
       setMessage({
         tone: "error",
-        text: "缺少必填欄位：活動名稱、日期、開始時間、結束時間與場地皆需填寫。",
+        text: "申請尚未送出。請修正標示的欄位後再試一次。",
       });
       return;
     }
 
-    if (form.endTime <= form.startTime) {
-      setMessage({
-        tone: "error",
-        text: "時間格式不成立：結束時間必須晚於開始時間。",
-      });
-      return;
-    }
-
-    const conflict = applications.find(
-      (item) =>
-        item.id !== editingId &&
-        item.status !== "已退回" &&
-        item.venue.trim() === form.venue.trim() &&
-        item.date === form.date &&
-        form.startTime < item.endTime &&
-        form.endTime > item.startTime,
-    );
+    const conflict = findVenueConflict(applications, form, editingId) as
+      | Application
+      | null;
 
     if (conflict) {
+      setFieldErrors({
+        venue: `此場地與「${conflict.activityName}」的使用時間重疊。`,
+      });
       setMessage({
         tone: "error",
-        text: `場地衝突：${conflict.venue} 在 ${conflict.date} ${conflict.startTime}–${conflict.endTime} 已有申請，系統禁止送出。`,
+        text: `無法送出：${conflict.venue} 在 ${conflict.date} ${conflict.startTime}–${conflict.endTime} 已有申請。請更換場地或調整時間。`,
       });
       return;
     }
+
+    setFieldErrors({});
+    setIsSubmitting(true);
+    setMessage({ tone: "loading", text: "正在檢查資料並送出，請勿重複操作。" });
+    await waitForFeedback();
 
     if (editingId !== null) {
       const current = applications.find((item) => item.id === editingId);
@@ -198,6 +240,7 @@ export default function Prototype() {
       );
       setEditingId(null);
       setForm(emptyForm);
+      setIsSubmitting(false);
       return;
     }
 
@@ -219,6 +262,7 @@ export default function Prototype() {
       `${newApplication.activityName}已送出，等待課外活動組處理。`,
     );
     setForm(emptyForm);
+    setIsSubmitting(false);
   }
 
   function startSupplement(application: Application) {
@@ -235,31 +279,43 @@ export default function Prototype() {
       tone: "info",
       text: `正在修改「${application.activityName}」。完成後請按下重新送出。`,
     });
+    setFieldErrors({});
   }
 
   function cancelSupplement() {
     setEditingId(null);
     setForm(emptyForm);
+    setFieldErrors({});
     setMessage({
       tone: "info",
       text: "已取消修改，原申請仍維持待補件狀態。",
     });
   }
 
-  function updateApplicationStatus(
+  async function updateApplicationStatus(
     applicationId: number,
     status: "已核准" | "待補件" | "已退回",
   ) {
+    if (reviewingId !== null) return;
     const application = applications.find((item) => item.id === applicationId);
     const note = reviewDrafts[applicationId]?.trim() ?? "";
+    const reviewError = validateReviewTransition(
+      application?.status ?? "",
+      status,
+      note,
+    );
 
-    if (status !== "已核准" && !note) {
+    if (reviewError) {
       setStaffMessage({
         tone: "error",
-        text: "要求補件或退回申請時，必須先填寫原因。",
+        text: reviewError,
       });
       return;
     }
+
+    setReviewingId(applicationId);
+    setStaffMessage({ tone: "loading", text: "正在保存審核結果，請勿重複操作。" });
+    await waitForFeedback();
 
     setApplications((current) =>
       current.map((item) =>
@@ -287,6 +343,7 @@ export default function Prototype() {
         `${application?.activityName ?? "新活動"}已公布，可查看活動時間與地點。`,
       );
     }
+    setReviewingId(null);
   }
 
   function clearRoleNotifications() {
@@ -299,11 +356,15 @@ export default function Prototype() {
     setApplications([]);
     setForm(emptyForm);
     setEditingId(null);
+    setFieldErrors({});
     setReviewDrafts({});
     setNotifications([]);
     setStudentQuery("");
     setStudentVenue("全部場地");
     setActiveRole("club");
+    setIsSubmitting(false);
+    setReviewingId(null);
+    setShowPermissionDenied(false);
     setMessage({
       tone: "info",
       text: "示範資料已清除，可重新驗證完整跨角色流程。",
@@ -314,32 +375,54 @@ export default function Prototype() {
     });
   }
 
+  function loadAnonymousTestData() {
+    setApplications(anonymousTestApplications);
+    setForm({
+      activityName: "衝突測試活動",
+      date: "2026-08-15",
+      startTime: "15:00",
+      endTime: "17:00",
+      venue: "活動中心 R201",
+      description: "匿名測試資料：請觀察衝突訊息並自行決定如何修正。",
+    });
+    setEditingId(null);
+    setFieldErrors({});
+    setReviewDrafts({});
+    setNotifications([
+      { id: 2001, role: "staff", message: "攝影社迎新工作坊已送出，等待審核。" },
+      { id: 2002, role: "venue", message: "吉他社成果發表已核准，請查看場地資訊。" },
+      { id: 2003, role: "student", message: "吉他社成果發表已公布。" },
+    ]);
+    setActiveRole("club");
+    setShowPermissionDenied(false);
+    setMessage({
+      tone: "info",
+      text: "已載入匿名測試資料與衝突範例。可執行場地衝突、審核、補件與查詢任務。",
+    });
+  }
+
   return (
     <section className="section prototype-section" id="prototype">
       <div className="section-heading">
         <span className="section-index">04</span>
         <div>
           <p className="kicker">系統實作成果</p>
-          <h2>四種角色、補件審核與通知，一次完整驗證。</h2>
+          <h2>三個核心任務、六類狀態，可直接操作驗證。</h2>
         </div>
       </div>
 
       <div className="scenario-guide">
         <div>
-          <span>申請</span>
-          <p>社團幹部建立活動，查看結果並依補件原因修改重送。</p>
+          <span>TF-01 · 建立申請</span>
+          <p>社團幹部完成有效申請，看到送出處理與待審核結果。</p>
         </div>
         <div>
-          <span>審核</span>
-          <p>課外活動組查看詳情，核准、要求補件或填寫原因退回。</p>
+          <span>TF-02 · 處理衝突</span>
+          <p>系統指出衝突場地與時間，使用者修改後可再次送出。</p>
         </div>
         <div>
-          <span>場地</span>
-          <p>場地管理員查看已核准場地行程與活動使用狀態。</p>
-        </div>
-        <div>
-          <span>活動</span>
-          <p>一般學生搜尋、篩選並查看已核准活動資訊。</p>
+          <span>TF-03 · 補件審核</span>
+          <p>老師要求補件、幹部修改重送，再由老師完成核准。</p>
         </div>
       </div>
 
@@ -352,7 +435,10 @@ export default function Prototype() {
             <button
               className={activeRole === role.id ? "active" : ""}
               key={role.id}
-              onClick={() => setActiveRole(role.id)}
+              onClick={() => {
+                setActiveRole(role.id);
+                setShowPermissionDenied(false);
+              }}
               type="button"
               aria-pressed={activeRole === role.id}
             >
@@ -375,9 +461,21 @@ export default function Prototype() {
             <strong>{activeRoleData.label}操作畫面</strong>
             <small>{activeRoleData.requirement} / Mock Data</small>
           </div>
-          <button type="button" onClick={resetPrototype}>
-            清除示範資料
-          </button>
+          <div className="prototype-tools">
+            <button type="button" onClick={loadAnonymousTestData}>
+              載入匿名測試資料
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowPermissionDenied(true)}
+              aria-pressed={showPermissionDenied}
+            >
+              預覽權限不足
+            </button>
+            <button type="button" onClick={resetPrototype}>
+              清除示範資料
+            </button>
+          </div>
         </div>
 
         {activeNotifications.length > 0 && (
@@ -397,7 +495,9 @@ export default function Prototype() {
           </div>
         )}
 
-        {activeRole === "club" && (
+        {showPermissionDenied ? (
+          <PermissionDenied onBack={() => setShowPermissionDenied(false)} />
+        ) : activeRole === "club" ? (
           <div className="prototype-grid">
             <form onSubmit={submitApplication} noValidate>
               <div className="form-heading">
@@ -410,75 +510,139 @@ export default function Prototype() {
               <label>
                 活動名稱 *
                 <input
+                  id="activityName"
                   value={form.activityName}
                   onChange={(event) =>
                     updateField("activityName", event.target.value)
                   }
                   placeholder="輸入活動名稱"
+                  aria-invalid={Boolean(fieldErrors.activityName)}
+                  aria-describedby={fieldErrors.activityName ? "activityName-error" : undefined}
+                  disabled={isSubmitting}
                 />
+                {fieldErrors.activityName && (
+                  <small className="field-error" id="activityName-error">
+                    {fieldErrors.activityName}
+                  </small>
+                )}
               </label>
               <div className="form-row">
                 <label>
                   日期 *
                   <input
+                    id="date"
                     type="date"
                     value={form.date}
                     onChange={(event) => updateField("date", event.target.value)}
+                    aria-invalid={Boolean(fieldErrors.date)}
+                    aria-describedby={fieldErrors.date ? "date-error" : undefined}
+                    disabled={isSubmitting}
                   />
+                  {fieldErrors.date && (
+                    <small className="field-error" id="date-error">
+                      {fieldErrors.date}
+                    </small>
+                  )}
                 </label>
                 <label>
                   場地 *
                   <input
+                    id="venue"
                     value={form.venue}
                     onChange={(event) =>
                       updateField("venue", event.target.value)
                     }
                     placeholder="輸入場地"
+                    aria-invalid={Boolean(fieldErrors.venue)}
+                    aria-describedby={fieldErrors.venue ? "venue-error" : undefined}
+                    disabled={isSubmitting}
                   />
+                  {fieldErrors.venue && (
+                    <small className="field-error" id="venue-error">
+                      {fieldErrors.venue}
+                    </small>
+                  )}
                 </label>
               </div>
               <div className="form-row">
                 <label>
                   開始時間 *
                   <input
+                    id="startTime"
                     type="time"
                     value={form.startTime}
                     onChange={(event) =>
                       updateField("startTime", event.target.value)
                     }
+                    aria-invalid={Boolean(fieldErrors.startTime)}
+                    aria-describedby={fieldErrors.startTime ? "startTime-error" : undefined}
+                    disabled={isSubmitting}
                   />
+                  {fieldErrors.startTime && (
+                    <small className="field-error" id="startTime-error">
+                      {fieldErrors.startTime}
+                    </small>
+                  )}
                 </label>
                 <label>
                   結束時間 *
                   <input
+                    id="endTime"
                     type="time"
                     value={form.endTime}
                     onChange={(event) =>
                       updateField("endTime", event.target.value)
                     }
+                    aria-invalid={Boolean(fieldErrors.endTime)}
+                    aria-describedby={fieldErrors.endTime ? "endTime-error" : undefined}
+                    disabled={isSubmitting}
                   />
+                  {fieldErrors.endTime && (
+                    <small className="field-error" id="endTime-error">
+                      {fieldErrors.endTime}
+                    </small>
+                  )}
                 </label>
               </div>
               <label>
                 活動說明
                 <textarea
+                  id="description"
                   value={form.description}
                   onChange={(event) =>
                     updateField("description", event.target.value)
                   }
                   placeholder="輸入活動說明"
                   rows={4}
+                  disabled={isSubmitting}
                 />
               </label>
-              <button className="submit-button" type="submit">
-                {editingId ? "重新送出申請" : "檢查並送出申請"}
-                <span>→</span>
+              <button
+                className="submit-button"
+                type="submit"
+                disabled={isSubmitting}
+                aria-describedby="submit-state-hint"
+              >
+                {isSubmitting
+                  ? "正在檢查並送出…"
+                  : editingId
+                    ? "重新送出申請"
+                    : "檢查並送出申請"}
+                <span aria-hidden="true">{isSubmitting ? "…" : "→"}</span>
               </button>
+              <small className="submit-state-hint" id="submit-state-hint">
+                {isSubmitting
+                  ? "處理期間欄位與按鈕暫時停用，避免重複送出。"
+                  : canSubmit
+                    ? "資料看起來完整，送出後仍會檢查時間與場地衝突。"
+                    : "請完成所有標示 * 的欄位。"}
+              </small>
               {editingId && (
                 <button
                   className="cancel-edit-button"
                   type="button"
                   onClick={cancelSupplement}
+                  disabled={isSubmitting}
                 >
                   取消修改
                 </button>
@@ -505,9 +669,9 @@ export default function Prototype() {
               />
             </div>
           </div>
-        )}
+        ) : null}
 
-        {activeRole === "staff" && (
+        {!showPermissionDenied && activeRole === "staff" && (
           <div className="role-panel">
             <div className="role-panel-heading">
               <div>
@@ -571,7 +735,12 @@ export default function Prototype() {
                             }))
                           }
                           placeholder="要求補件或退回時必填"
+                          aria-describedby={`review-note-hint-${item.id}`}
+                          disabled={reviewingId === item.id}
                         />
+                        <small id={`review-note-hint-${item.id}`}>
+                          核准可不填；要求補件或退回時必須提供可採取行動的原因。
+                        </small>
                       </label>
                       <div className="review-actions three-actions">
                         <button
@@ -580,8 +749,9 @@ export default function Prototype() {
                             updateApplicationStatus(item.id, "已核准")
                           }
                           type="button"
+                          disabled={reviewingId === item.id}
                         >
-                          核准
+                          {reviewingId === item.id ? "處理中…" : "核准"}
                         </button>
                         <button
                           className="supplement-action"
@@ -589,6 +759,7 @@ export default function Prototype() {
                             updateApplicationStatus(item.id, "待補件")
                           }
                           type="button"
+                          disabled={reviewingId === item.id}
                         >
                           要求補件
                         </button>
@@ -598,6 +769,7 @@ export default function Prototype() {
                             updateApplicationStatus(item.id, "已退回")
                           }
                           type="button"
+                          disabled={reviewingId === item.id}
                         >
                           退回
                         </button>
@@ -620,7 +792,7 @@ export default function Prototype() {
           </div>
         )}
 
-        {activeRole === "venue" && (
+        {!showPermissionDenied && activeRole === "venue" && (
           <div className="role-panel">
             <div className="role-panel-heading">
               <div>
@@ -665,7 +837,7 @@ export default function Prototype() {
           </div>
         )}
 
-        {activeRole === "student" && (
+        {!showPermissionDenied && activeRole === "student" && (
           <div className="role-panel student-view">
             <div className="role-panel-heading">
               <div>
@@ -767,18 +939,41 @@ export default function Prototype() {
 function SystemMessage({
   message,
 }: {
-  message: { tone: "success" | "error" | "info"; text: string };
+  message: { tone: MessageTone; text: string };
 }) {
   return (
-    <div className={`system-message ${message.tone}`}>
-      <span>
+    <div
+      className={`system-message ${message.tone}`}
+      role={message.tone === "error" ? "alert" : "status"}
+      aria-live={message.tone === "error" ? "assertive" : "polite"}
+      aria-atomic="true"
+    >
+      <span aria-hidden="true">
         {message.tone === "success"
           ? "✓"
           : message.tone === "error"
             ? "!"
-            : "i"}
+            : message.tone === "loading"
+              ? "…"
+              : "i"}
       </span>
       <p>{message.text}</p>
+    </div>
+  );
+}
+
+function PermissionDenied({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="permission-denied" role="alert" aria-labelledby="permission-title">
+      <span aria-hidden="true">!</span>
+      <p className="kicker">權限不足狀態</p>
+      <h3 id="permission-title">你目前沒有檢視此功能的權限</h3>
+      <p>
+        請返回目前角色的操作畫面；正式系統仍須由伺服端驗證身分與權限，不能只靠隱藏按鈕。
+      </p>
+      <button type="button" onClick={onBack} autoFocus>
+        返回目前角色畫面
+      </button>
     </div>
   );
 }

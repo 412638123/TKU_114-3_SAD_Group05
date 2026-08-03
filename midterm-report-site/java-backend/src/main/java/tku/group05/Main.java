@@ -249,6 +249,11 @@ final class ApplicationService {
         for (int index = 0; index < applications.size(); index++) {
             ActivityApplication current = applications.get(index);
             if (current.id() == id) {
+                if (!"待審核".equals(current.status())) {
+                    throw new IllegalArgumentException(
+                            "目前狀態不可再次審核；請重新整理並確認申請狀態。"
+                    );
+                }
                 ActivityApplication updated = new ActivityApplication(
                         current.id(),
                         current.activityName(),

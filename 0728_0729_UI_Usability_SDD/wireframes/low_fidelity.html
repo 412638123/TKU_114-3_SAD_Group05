@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>低擬真線框圖</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #ececec; color: #222; font-family: "Microsoft JhengHei", sans-serif; }
+    main { width: 1400px; padding: 48px; }
+    h1 { font-size: 34px; margin: 0 0 28px; }
+    .roles { display: grid; gap: 12px; grid-template-columns: repeat(4, 1fr); }
+    .roles div, .box { background: #fff; border: 3px solid #555; padding: 18px; }
+    .roles div:first-child { background: #d7d7d7; }
+    .screen { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; margin-top: 20px; }
+    .box { min-height: 610px; }
+    h2 { border-bottom: 3px solid #555; margin: 0 0 22px; padding-bottom: 14px; }
+    label { display: block; font-weight: 700; margin: 14px 0 6px; }
+    .input { border: 2px solid #777; height: 48px; }
+    .row { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+    .button { background: #444; color: white; font-weight: 800; margin-top: 22px; padding: 16px; text-align: center; }
+    .message { background: #e0e0e0; border: 2px solid #777; margin-bottom: 18px; padding: 16px; }
+    .card { border: 2px solid #777; margin-top: 14px; padding: 18px; }
+    .tag { background: #444; color: white; display: inline-block; padding: 6px 10px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>低擬真線框圖｜社團幹部建立申請與查看狀態</h1>
+    <div class="roles"><div>社團幹部</div><div>課外活動組</div><div>場地管理員</div><div>一般學生</div></div>
+    <section class="screen">
+      <div class="box">
+        <h2>建立活動申請</h2>
+        <label>活動名稱 *</label><div class="input"></div>
+        <div class="row"><div><label>日期 *</label><div class="input"></div></div><div><label>場地 *</label><div class="input"></div></div></div>
+        <div class="row"><div><label>開始時間 *</label><div class="input"></div></div><div><label>結束時間 *</label><div class="input"></div></div></div>
+        <label>活動說明</label><div class="input" style="height:100px"></div>
+        <div class="button">檢查並送出申請</div>
+      </div>
+      <div class="box">
+        <h2>我的申請與狀態</h2>
+        <div class="message">系統回饋／錯誤／處理中</div>
+        <div class="card"><span class="tag">待審核</span><h3>活動名稱</h3><p>日期・時間・場地・版本</p></div>
+        <div class="card"><span class="tag">待補件</span><h3>活動名稱</h3><p>補件原因與修改入口</p></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

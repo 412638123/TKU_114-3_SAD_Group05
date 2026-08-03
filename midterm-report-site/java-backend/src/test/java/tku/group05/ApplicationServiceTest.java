@@ -21,6 +21,13 @@ public final class ApplicationServiceTest {
                 .orElseThrow();
         check("已核准".equals(approved.status()), "課外活動組應能核准申請");
 
+        try {
+            service.updateStatus(approved.id(), "待補件", "不應允許核准後回轉");
+            throw new AssertionError("已核准申請不應再次變更審核狀態");
+        } catch (IllegalArgumentException expected) {
+            check(expected.getMessage().contains("不可再次審核"), "應拒絕未定義狀態轉移");
+        }
+
         CreateResult differentVenue = service.create(request(
                 "另一場活動",
                 "2026-07-26",
