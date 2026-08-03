@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   canResubmit,
   findVenueConflict,
+  formatApplicationReference,
   validateApplication,
   validateReviewTransition,
 } from "../app/prototype-domain.mjs";
@@ -38,6 +39,14 @@ test("renders the Group05 usability prototype", async () => {
   assert.match(html, /建立活動申請/);
   assert.match(html, /TF-03 · 補件審核/);
   assert.match(html, /課外活動組/);
+  assert.match(html, /步驟 1｜先選擇角色，再開始操作/);
+  assert.match(html, /場地 \*（可輸入或從建議選擇）/);
+  assert.match(html, /可直接輸入場地名稱，也可點選瀏覽器提供的建議/);
+});
+
+test("formats a stable application reference", () => {
+  assert.equal(formatApplicationReference(1001), "A-001001");
+  assert.equal(formatApplicationReference(123456789), "A-456789");
 });
 
 test("validates required fields and time order", () => {

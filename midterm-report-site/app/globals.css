@@ -818,6 +818,31 @@ p {
   margin-bottom: 18px;
 }
 
+.role-switcher-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 2px 9px;
+}
+
+.role-switcher-heading strong {
+  color: var(--navy);
+  font-size: 13px;
+}
+
+.role-switcher-heading span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.field-hint {
+  color: var(--muted);
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
 .role-switcher button {
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid var(--line);
@@ -1377,6 +1402,18 @@ p {
   color: #654f49;
   line-height: 1.6;
   margin: 5px 0 0;
+}
+
+.review-note.supplement-note {
+  background: #fff8e8;
+  border: 1px solid #eed28f;
+  border-left: 4px solid #c98216;
+  box-shadow: 0 8px 18px rgba(126, 82, 13, 0.08);
+}
+
+.review-note.supplement-note b {
+  color: #795000;
+  font-size: 11px;
 }
 
 .supplement-edit-button {

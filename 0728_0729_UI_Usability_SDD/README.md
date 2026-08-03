@@ -2,13 +2,13 @@
 
 ## 工作範圍與基準
 
-本資料夾將 0722 SRS、0720 使用案例、0727 物件導向模型與既有 `midterm-report-site` 轉成可操作、可測試及可追溯的介面成果。核心採用 FR-01～FR-07、UC-01～UC-04；FR-08～FR-10 保留為原型示範與待確認。
+本資料夾將 0722 SRS、0720 使用案例、0727 物件導向模型與既有 `midterm-report-site` 轉成可操作、可測試及可追溯的介面成果。已確認的核心實作範圍採用 FR-01～FR-07、UC-01～UC-04；第三個跨角色設計驗證任務使用 FR-08、UC-05～UC-06 的原型示範，但不宣稱其正式規則已確認。FR-09～FR-10 同樣只作原型示範。
 
 ## 三個核心任務
 
 1. TF-01：社團幹部建立有效申請並看到待審核。
 2. TF-02：社團幹部理解場地衝突，修改後成功送出。
-3. TF-03：老師要求補件、幹部修改重送，再由老師核准。
+3. TF-03：課外活動組要求補件、幹部修改重送，再由課外活動組核准（FR-08 待確認規則的設計驗證）。
 
 ## 原型操作方式
 
@@ -20,7 +20,7 @@
 
 ## 測試與修正摘要
 
-功能測試涵蓋主要、替代、錯誤、狀態、權限與回歸。正式結果見 [ui_and_state_tests.md](ui_and_state_tests.md)。P01、P02 第一輪真人測試已完成並保存匿名截圖、時間與問題；但該輪 UT-02、UT-03 與原任務卡不一致，原訂場地衝突及補件審核仍需補測，改善結論也須待重測。
+功能測試涵蓋主要、替代、錯誤、狀態、權限與回歸。正式結果見 [ui_and_state_tests.md](ui_and_state_tests.md)。P01、P02 已完成 UT-01～UT-04 第二輪真人測試，僅保存匿名文字摘要、約略時間與問題，未保存可識別截圖。8 次任務中 6 次完成、2 次部分完成、0 次失敗；場地衝突、通知與狀態均取得真人證據，角色入口與補件原因位置仍有改善空間。
 
 正式真人測試前已依程式碼與啟發式檢查修正三個高影響候選：送出缺載入與防重複、缺權限不足承接、錯誤未與欄位關聯；另修正後端非法狀態回轉及失效前端測試。這些修正仍須由真人重測才能宣稱可用性改善。
 
@@ -28,7 +28,9 @@
 
 - [任務流程](task_flows.md)
 - [資訊架構](information_architecture.md)
+- [資訊架構圖](information_architecture.png)
 - [畫面流程](screen_flow.png)
+- [重要介面狀態總覽](ui_states_overview.png)
 - [畫面清單](screen_inventory.md)
 - [介面狀態與錯誤](ui_state_specification.md)
 - [無障礙檢核](accessibility_check.md)
@@ -36,8 +38,10 @@
 - [一致性矩陣](model_screen_data_acceptance_matrix.md)
 - [可用性測試計畫](usability_test_plan.md)
 - [修正與重測](fix_retest_report.md)
+- [修正後介面非真人功能證據](evidence/functional/current_ui_fix_evidence.md)
 - [SDD v1](SDD_v1.md)
 - [程式碼代理紀錄](ai_code_agent_log.md)
+- [作業要求核對與待補清單](requirements_audit.md)
 
 ## 已知限制與 8/3 銜接
 
@@ -47,4 +51,4 @@
 
 | 提交識別 | 內容 | 對應任務／問題 | 測試證據 | 文件連結 |
 | --- | --- | --- | --- | --- |
-| 基準 59fa6ff；目前尚未提交 | 0728–0729 介面重構、測試、流程圖、文件與證據 | TF-01～TF-03、U-01～U-05 | evidence/functional、evidence/before_after | 本資料夾與 ../midterm-report-site |
+| 基準 59fa6ff；成果提交識別於最終驗證後回填 | 0728–0729 介面重構、測試、流程圖、文件與證據 | TF-01～TF-03、U-01～U-11 | evidence/functional、evidence/before_after | 本資料夾與 ../midterm-report-site |

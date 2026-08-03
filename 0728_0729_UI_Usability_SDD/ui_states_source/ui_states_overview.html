@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Group05 重要介面狀態</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f7f2e8; color: #10263f; font-family: "Microsoft JhengHei", sans-serif; }
+    main { width: 1280px; height: 720px; padding: 32px 40px; overflow: hidden; }
+    header { display: flex; justify-content: space-between; align-items: end; border-bottom: 4px solid #e76f51; padding-bottom: 14px; }
+    h1 { font-size: 32px; margin: 0; }
+    header p { color: #52616c; font-size: 15px; margin: 0; }
+    .summary { display: flex; gap: 10px; margin: 16px 0 14px; }
+    .summary span { color: #1d786f; background: #edf5f3; border-radius: 999px; font-size: 12px; font-weight: 800; padding: 7px 12px; }
+    .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .card { min-height: 228px; background: white; border: 1px solid #d8dedf; border-radius: 12px; overflow: hidden; }
+    .card-head { display: flex; justify-content: space-between; align-items: center; background: #10263f; color: white; padding: 12px 14px; }
+    .card-head b { color: #6fd0c4; font-size: 12px; }
+    .type { background: #edf5f3; color: #1d786f; border-radius: 999px; font-size: 10px; font-weight: 800; padding: 4px 8px; }
+    .type.error { background: #fbe9e4; color: #8f321e; }
+    .content { padding: 13px 14px; }
+    h2 { font-size: 16px; margin: 0 0 7px; }
+    p { color: #52616c; font-size: 11px; line-height: 1.5; margin: 0 0 9px; }
+    .outcome { color: #10263f; background: #edf5f3; border-left: 3px solid #2a9d8f; font-size: 11px; font-weight: 700; padding: 7px 8px; }
+    .outcome.error { background: #fbe9e4; border-color: #e76f51; color: #8f321e; }
+    footer { color: #52616c; font-size: 12px; margin-top: 13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <header><h1>重要介面狀態｜10 個可觀察畫面</h1><p>Group05 · 0728–0729 UI／UX 原型</p></header>
+    <div class="summary"><span>正常</span><span>空白</span><span>載入</span><span>錯誤</span><span>停用</span><span>權限不足</span></div>
+    <section class="grid" aria-label="十個重要畫面與狀態">
+      <article class="card"><div class="card-head"><b>UI-01</b><span class="type">正常</span></div><div class="content"><h2>建立活動申請</h2><p>輸入活動、日期、時間、場地與說明。</p><div class="outcome">出口：處理中／錯誤／衝突</div></div></article>
+      <article class="card"><div class="card-head"><b>UI-02</b><span class="type">空白</span></div><div class="content"><h2>我的申請空白</h2><p>說明目前 0 筆資料及可採取的下一步。</p><div class="outcome">恢復：前往建立申請</div></div></article>
+      <article class="card"><div class="card-head"><b>UI-03</b><span class="type error">錯誤</span></div><div class="content"><h2>表單驗證錯誤</h2><p>指出欄位位置、原因及修正方式。</p><div class="outcome error">資料不建立，保留正確輸入</div></div></article>
+      <article class="card"><div class="card-head"><b>UI-04</b><span class="type">載入／停用</span></div><div class="content"><h2>送出處理中</h2><p>顯示等待原因並防止重複送出。</p><div class="outcome">完成後自動恢復操作</div></div></article>
+      <article class="card"><div class="card-head"><b>UI-05</b><span class="type">正常</span></div><div class="content"><h2>我的申請與狀態</h2><p>顯示編號、版本、狀態與審核原因。</p><div class="outcome">終點：待審核／待補件／已核准</div></div></article>
+      <article class="card"><div class="card-head"><b>UI-06</b><span class="type error">錯誤</span></div><div class="content"><h2>場地衝突／審核錯誤</h2><p>顯示衝突對象或缺少原因，提供恢復方式。</p><div class="outcome error">修改場地、時間或原因後重試</div></div></article>
+      <article class="card"><div class="card-head"><b>UI-07</b><span class="type">正常</span></div><div class="content"><h2>活動申請審核中心</h2><p>核准、要求補件或退回，並保存原因。</p><div class="outcome">僅待審核資料可操作</div></div></article>
+      <article class="card"><div class="card-head"><b>UI-08</b><span class="type">替代</span></div><div class="content"><h2>補件修改</h2><p>顯示原資料與補件原因，可重送或取消。</p><div class="outcome">重送 revision +1；取消維持原狀態</div></div></article>
+      <article class="card"><div class="card-head"><b>UI-09</b><span class="type error">權限不足</span></div><div class="content"><h2>權限不足</h2><p>說明限制與正式驗證缺口。</p><div class="outcome error">唯一操作：返回目前角色畫面</div></div></article>
+      <article class="card"><div class="card-head"><b>UI-10</b><span class="type">正常／空白</span></div><div class="content"><h2>場地／活動查詢</h2><p>依角色顯示已核准資料、搜尋與篩選。</p><div class="outcome">無結果時說明原因與下一步</div></div></article>
+    </section>
+    <footer>每個狀態均定義觸發條件、可用操作與恢復方式；詳細規格見 ui_state_specification.md。</footer>
+  </main>
+</body>
+</html>

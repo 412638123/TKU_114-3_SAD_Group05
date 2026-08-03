@@ -6,6 +6,10 @@ export const requiredFields = [
   ["venue", "請輸入活動場地。"],
 ];
 
+export function formatApplicationReference(id) {
+  return `A-${String(id).slice(-6).padStart(6, "0")}`;
+}
+
 export function validateApplication(form) {
   const errors = {};
 

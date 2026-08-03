@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import {
   findVenueConflict,
+  formatApplicationReference,
   validateApplication,
   validateReviewTransition,
 } from "./prototype-domain.mjs";
@@ -255,7 +256,7 @@ export default function Prototype() {
     setApplications((current) => [newApplication, ...current]);
     setMessage({
       tone: "success",
-      text: "申請建立成功，狀態已由「建立中」更新為「待審核」。",
+      text: `申請建立成功（申請編號 ${formatApplicationReference(newApplication.id)}），目前狀態為「待審核」。請在「我的申請與狀態」確認後續進度。`,
     });
     addNotification(
       "staff",
@@ -422,10 +423,14 @@ export default function Prototype() {
         </div>
         <div>
           <span>TF-03 · 補件審核</span>
-          <p>老師要求補件、幹部修改重送，再由老師完成核准。</p>
+          <p>課外活動組要求補件、幹部修改重送，再由課外活動組完成核准。</p>
         </div>
       </div>
 
+      <div className="role-switcher-heading">
+        <strong>步驟 1｜先選擇角色，再開始操作</strong>
+        <span>目前角色：{activeRoleData.label}</span>
+      </div>
       <div className="role-switcher" aria-label="切換操作角色">
         {roles.map((role) => {
           const notificationCount = notifications.filter(
@@ -545,18 +550,27 @@ export default function Prototype() {
                   )}
                 </label>
                 <label>
-                  場地 *
+                  場地 *（可輸入或從建議選擇）
                   <input
                     id="venue"
+                    list="venue-options"
                     value={form.venue}
                     onChange={(event) =>
                       updateField("venue", event.target.value)
                     }
-                    placeholder="輸入場地"
+                    placeholder="例如：活動中心 R201"
                     aria-invalid={Boolean(fieldErrors.venue)}
-                    aria-describedby={fieldErrors.venue ? "venue-error" : undefined}
+                    aria-describedby={fieldErrors.venue ? "venue-hint venue-error" : "venue-hint"}
                     disabled={isSubmitting}
                   />
+                  <datalist id="venue-options">
+                    <option value="活動中心 R201" />
+                    <option value="體育館會議室" />
+                    <option value="學生活動中心大禮堂" />
+                  </datalist>
+                  <small className="field-hint" id="venue-hint">
+                    可直接輸入場地名稱，也可點選瀏覽器提供的建議。
+                  </small>
                   {fieldErrors.venue && (
                     <small className="field-error" id="venue-error">
                       {fieldErrors.venue}
@@ -1006,7 +1020,7 @@ function ApplicationCards({
               {item.status}
             </span>
             <small>
-              {item.date} · 第 {item.revision} 版
+              {formatApplicationReference(item.id)} · {item.date} · 第 {item.revision} 版
             </small>
           </div>
           <h4>{item.activityName}</h4>
@@ -1015,8 +1029,12 @@ function ApplicationCards({
           </p>
           {item.description && <small>{item.description}</small>}
           {item.reviewNote && (
-            <div className="review-note">
-              <b>{item.status === "待補件" ? "補件原因" : "審核說明"}</b>
+            <div
+              className={`review-note ${item.status === "待補件" ? "supplement-note" : ""}`}
+              role="note"
+              aria-label={item.status === "待補件" ? "補件原因" : "審核說明"}
+            >
+              <b>{item.status === "待補件" ? "補件原因｜請依此修改" : "審核說明"}</b>
               <p>{item.reviewNote}</p>
             </div>
           )}
