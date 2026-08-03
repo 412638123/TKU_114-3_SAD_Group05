@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>中擬真線框圖｜校園社團活動與場地管理平台</title>
+  <style>
+    :root { --ink:#10263f; --muted:#52616c; --line:#d8dedf; --paper:#f7f2e8; --panel:#fff; --teal:#2a9d8f; --teal-soft:#edf5f3; --orange:#e76f51; --orange-soft:#fbe9e4; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#ebe4d8; color:var(--ink); font:15px/1.55 "Segoe UI","Noto Sans TC",sans-serif; }
+    .sheet { width:1360px; min-height:960px; margin:28px auto; background:var(--paper); border:1px solid #b8c5cf; box-shadow:0 14px 42px #26394a22; }
+    .browser { height:44px; display:flex; align-items:center; gap:8px; padding:0 18px; background:#eee7dc; border-bottom:1px solid var(--line); }
+    .dot { width:11px; height:11px; border-radius:50%; background:#aab8c3; }
+    .address { margin-left:12px; width:420px; padding:5px 14px; border:1px solid #c7d1d9; border-radius:16px; background:#fff; color:#7b8b98; font-size:12px; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:22px 30px; background:#fff; border-bottom:1px solid var(--line); }
+    .brand { font-weight:800; letter-spacing:.02em; }
+    .tag { color:var(--muted); font-size:13px; }
+    .layout { display:grid; grid-template-columns:238px 1fr; min-height:850px; }
+    aside { padding:24px 18px; background:#f1ece3; border-right:1px solid var(--line); }
+    .aside-label { margin:0 10px 8px; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.12em; }
+    .nav { display:block; margin:5px 0; padding:11px 12px; border-radius:8px; color:var(--ink); }
+    .nav.active { background:#fff; border:1px solid var(--line); font-weight:700; box-shadow:0 2px 8px #26394a0b; }
+    .role-box { margin-top:28px; padding:15px; background:#fff; border:1px solid var(--line); border-radius:10px; }
+    .role-box strong { display:block; margin-bottom:8px; }
+    .role-chip { display:inline-block; margin:4px 3px 0 0; padding:6px 10px; border-radius:15px; background:var(--teal-soft); color:#1d786f; font-size:12px; font-weight:700; }
+    main { padding:28px 34px 40px; }
+    .eyebrow { margin:0 0 5px; color:var(--teal); font-weight:800; font-size:12px; letter-spacing:.12em; }
+    h1 { margin:0; font-size:28px; }
+    .lead { margin:6px 0 22px; color:var(--muted); }
+    .tasks { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:22px; }
+    .task { padding:14px 15px; background:#fff; border:1px solid var(--line); border-radius:10px; }
+    .task b { display:block; margin-bottom:4px; color:var(--teal); }
+    .task span { color:var(--muted); font-size:13px; }
+    .workspace { display:grid; grid-template-columns:1.2fr .8fr; gap:18px; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+    .card-head { display:flex; justify-content:space-between; align-items:center; padding:15px 18px; border-bottom:1px solid var(--line); }
+    .card-head h2 { margin:0; font-size:17px; }
+    .step { padding:4px 9px; border-radius:12px; background:var(--teal-soft); color:#1d786f; font-size:11px; font-weight:700; }
+    .form { display:grid; grid-template-columns:1fr 1fr; gap:13px; padding:18px; }
+    label { display:block; color:#53697b; font-size:12px; font-weight:700; }
+    .wide { grid-column:1/-1; }
+    .field { height:38px; margin-top:5px; border:1px solid #b9c8d3; border-radius:7px; background:#f8fafb; }
+    .field.textarea { height:62px; }
+    .hint { margin-top:4px; color:#81909d; font-size:11px; font-weight:400; }
+    .actions { grid-column:1/-1; display:flex; justify-content:flex-end; gap:9px; padding-top:4px; }
+    button { border:1px solid #aebcc7; border-radius:7px; padding:9px 14px; background:#fff; color:var(--ink); font-weight:700; }
+    button.primary { border-color:var(--teal); background:var(--teal); color:#fff; }
+    .notice { margin:18px; padding:12px 14px; border-left:4px solid var(--orange); background:var(--orange-soft); color:#8f321e; font-size:13px; }
+    .list { padding:2px 18px 18px; }
+    .item { margin-top:12px; padding:14px; border:1px solid var(--line); border-radius:9px; }
+    .item-top { display:flex; justify-content:space-between; gap:10px; }
+    .status { padding:4px 9px; border-radius:12px; background:var(--orange-soft); color:#8f321e; font-size:11px; font-weight:800; }
+    .meta { display:grid; grid-template-columns:1fr 1fr; gap:4px 14px; margin-top:9px; color:var(--muted); font-size:12px; }
+    .legend { display:flex; gap:12px; padding:12px 18px 17px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; }
+    .key::before { content:""; display:inline-block; width:8px; height:8px; margin-right:5px; border-radius:50%; background:#d9773f; }
+    .key.approved::before { background:#168b88; }
+    .key.revise::before { background:#8c6daf; }
+    footer { padding:8px 24px; border-top:1px solid var(--line); background:#fff; color:var(--muted); font-size:11px; }
+    /* 固定在 1280×720 畫布，方便與低擬真圖逐項對照。 */
+    body { overflow:hidden; font-size:12px; }
+    .sheet { width:1248px; height:688px; min-height:0; margin:16px; }
+    .browser { height:32px; }
+    header { height:52px; padding:12px 22px; }
+    .layout { grid-template-columns:210px 1fr; min-height:0; height:568px; }
+    aside { padding:16px 14px; }
+    .nav { margin:4px 0; padding:8px 10px; }
+    .role-box { margin-top:18px; padding:11px; }
+    main { padding:14px 18px; }
+    h1 { font-size:23px; }
+    .lead { margin:3px 0 10px; }
+    .tasks { gap:10px; margin-bottom:10px; }
+    .task { padding:9px 11px; }
+    .workspace { gap:12px; }
+    .card { height:411px; }
+    .card-head { padding:9px 12px; }
+    .card-head h2 { font-size:15px; }
+    .form { gap:7px 10px; padding:9px 12px; }
+    .field { height:27px; margin-top:2px; }
+    .field.textarea { height:42px; }
+    .hint { margin-top:2px; font-size:9px; }
+    .actions { padding-top:0; }
+    button { padding:6px 10px; }
+    .notice { margin:0 12px; padding:7px 9px; }
+    .list { padding:1px 11px 8px; }
+    .item { margin-top:8px; padding:9px; }
+    .meta { margin-top:5px; font-size:10px; }
+    .legend { gap:9px; padding:8px 11px; font-size:10px; }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="browser"><span class="dot"></span><span class="dot"></span><span class="dot"></span><div class="address">prototype.local / applications</div></div>
+    <header><div class="brand">校園社團活動與場地管理平台</div><div class="tag">Medium-fidelity wireframe · UI-01 / UI-02 / UI-03</div></header>
+    <div class="layout">
+      <aside>
+        <p class="aside-label">主要功能</p>
+        <span class="nav active">活動與場地申請</span><span class="nav">我的申請與進度</span><span class="nav">審核工作台</span><span class="nav">已核准活動</span>
+        <div class="role-box"><strong>目前角色</strong><span class="role-chip">社團幹部</span><div class="hint">可切換為課外活動組，查看不同權限畫面。</div></div>
+      </aside>
+      <main>
+        <p class="eyebrow">0728–0729 UI PROTOTYPE</p><h1>完成活動與場地申請</h1><p class="lead">以三個核心任務驗證表單、衝突處理與審核狀態。</p>
+        <div class="tasks"><div class="task"><b>01 建立申請</b><span>填寫活動、時間與場地後送出。</span></div><div class="task"><b>02 解決衝突</b><span>理解衝突原因並調整資料。</span></div><div class="task"><b>03 補件與審核</b><span>切換角色完成補件、重送與核准。</span></div></div>
+        <div class="workspace">
+          <section class="card">
+            <div class="card-head"><h2>活動申請表</h2><span class="step">步驟 1／2</span></div>
+            <div class="form">
+              <label class="wide">活動名稱<div class="field"></div></label><label>活動日期<div class="field"></div></label><label>預估人數<div class="field"></div></label><label>開始時間<div class="field"></div></label><label>結束時間<div class="field"></div></label><label class="wide">場地名稱<div class="field"></div><div class="hint">直接輸入或從建議清單選擇，例如：活動中心 R201</div></label><label class="wide">活動說明<div class="field textarea"></div></label><div class="actions"><button>清除</button><button class="primary">檢查並送出</button></div>
+            </div>
+            <div class="notice">系統訊息／衝突原因／送出成功會顯示在此處，並提供下一步。</div>
+          </section>
+          <section class="card">
+            <div class="card-head"><h2>我的申請</h2><span class="step">2 筆</span></div>
+            <div class="list"><div class="item"><div class="item-top"><strong>迎新說明會</strong><span class="status">待審核</span></div><div class="meta"><span>8/18 14:00–16:00</span><span>體育館會議室</span><span>申請編號 A-1024</span><span>等待行政確認</span></div></div><div class="item"><div class="item-top"><strong>攝影工作坊</strong><span class="status" style="background:#e5f5f3;color:#0f716e">已核准</span></div><div class="meta"><span>8/15 13:00–15:00</span><span>活動中心 R201</span><span>申請編號 A-1019</span><span>可查看活動頁</span></div></div></div>
+            <div class="legend"><span class="key">待審核</span><span class="key revise">待補件</span><span class="key approved">已核准</span></div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <footer>中擬真線框圖：呈現資訊層級、互動元件、角色入口與狀態色彩；不代表最終視覺稿。</footer>
+  </div>
+</body>
+</html>

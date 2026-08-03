@@ -57,7 +57,7 @@
 
 需求、模型、類別責任、畫面、資料與驗收的逐列對照見 [model_screen_data_acceptance_matrix.md](model_screen_data_acceptance_matrix.md)。功能、替代、錯誤、狀態、權限與回歸測試見 [ui_and_state_tests.md](ui_and_state_tests.md)。
 
-可用性測試計畫已完成，但 P01、P02 的實際觀察、原話、問題頻率及重測結果尚未執行，相關文件明確保留「尚未執行」，不得以自動測試或程式碼檢查取代。
+可用性測試計畫已完成。P01、P02 第一輪真人測試已提供匿名結果、時間、問題與使用心得，證據位於 `evidence/usability/`。第一輪實測的 UT-02、UT-03 與原任務卡不同，因此原訂場地衝突、補件重送與審核流程仍待補測；U-06～U-09 的改善結論須待修正後重測，不以自動測試取代。
 
 ### T. SDD v1 設計決策
 

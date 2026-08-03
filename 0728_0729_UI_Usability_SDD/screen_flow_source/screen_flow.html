@@ -7,23 +7,23 @@
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; background: #f7f2e8; color: #10263f; font-family: "Microsoft JhengHei", sans-serif; }
-    main { width: 1400px; min-height: 900px; padding: 56px 64px; }
-    header { display: flex; justify-content: space-between; align-items: end; border-bottom: 4px solid #e76f51; padding-bottom: 22px; }
-    h1 { font-size: 40px; margin: 0; }
-    header p { color: #52616c; font-size: 18px; margin: 0; }
-    .flow { display: grid; gap: 18px; margin-top: 30px; }
-    .lane { background: white; border: 1px solid #d8dedf; border-radius: 18px; display: grid; grid-template-columns: 190px 1fr; overflow: hidden; }
-    .lane-title { background: #10263f; color: white; display: flex; flex-direction: column; justify-content: center; padding: 26px; }
-    .lane-title b { color: #6fd0c4; font-size: 15px; margin-bottom: 8px; }
-    .lane-title span { font-size: 22px; font-weight: 800; }
-    .steps { align-items: center; display: grid; gap: 18px; grid-template-columns: repeat(7, minmax(0, 1fr)); padding: 22px; }
-    .step { align-items: center; background: #edf5f3; border: 2px solid #2a9d8f; border-radius: 12px; display: flex; font-size: 15px; font-weight: 800; justify-content: center; min-height: 72px; padding: 10px; text-align: center; }
+    main { width: 1280px; height: 720px; padding: 32px 40px; overflow: hidden; }
+    header { display: flex; justify-content: space-between; align-items: end; border-bottom: 4px solid #e76f51; padding-bottom: 14px; }
+    h1 { font-size: 32px; margin: 0; }
+    header p { color: #52616c; font-size: 15px; margin: 0; }
+    .flow { display: grid; gap: 12px; margin-top: 18px; }
+    .lane { min-height: 145px; background: white; border: 1px solid #d8dedf; border-radius: 12px; display: grid; grid-template-columns: 180px 1fr; overflow: hidden; }
+    .lane-title { background: #10263f; color: white; display: flex; flex-direction: column; justify-content: center; padding: 20px; }
+    .lane-title b { color: #6fd0c4; font-size: 13px; margin-bottom: 6px; }
+    .lane-title span { font-size: 19px; font-weight: 800; }
+    .steps { align-items: center; display: grid; gap: 12px; grid-template-columns: repeat(7, minmax(0, 1fr)); padding: 16px; }
+    .step { align-items: center; background: #edf5f3; border: 2px solid #2a9d8f; border-radius: 10px; display: flex; font-size: 13px; font-weight: 800; justify-content: center; min-height: 82px; padding: 8px; text-align: center; }
     .step.error { background: #fbe9e4; border-color: #e76f51; color: #8f321e; }
     .step.result { background: #10263f; border-color: #10263f; color: white; }
-    .arrow { color: #e76f51; font-size: 30px; font-weight: 900; text-align: center; }
-    .legend { display: flex; gap: 24px; margin-top: 26px; }
-    .legend span { align-items: center; display: flex; font-size: 14px; gap: 8px; }
-    .legend i { border-radius: 4px; display: inline-block; height: 18px; width: 18px; }
+    .arrow { color: #e76f51; font-size: 24px; font-weight: 900; text-align: center; }
+    .legend { display: flex; gap: 22px; margin-top: 14px; }
+    .legend span { align-items: center; display: flex; font-size: 12px; gap: 7px; }
+    .legend i { border-radius: 4px; display: inline-block; height: 16px; width: 16px; }
     .normal { background: #edf5f3; border: 2px solid #2a9d8f; }
     .exception { background: #fbe9e4; border: 2px solid #e76f51; }
     .outcome { background: #10263f; }

@@ -1,49 +1,93 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>低擬真線框圖</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>低擬真線框圖｜校園社團活動與場地管理平台</title>
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #ececec; color: #222; font-family: "Microsoft JhengHei", sans-serif; }
-    main { width: 1400px; padding: 48px; }
-    h1 { font-size: 34px; margin: 0 0 28px; }
-    .roles { display: grid; gap: 12px; grid-template-columns: repeat(4, 1fr); }
-    .roles div, .box { background: #fff; border: 3px solid #555; padding: 18px; }
-    .roles div:first-child { background: #d7d7d7; }
-    .screen { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; margin-top: 20px; }
-    .box { min-height: 610px; }
-    h2 { border-bottom: 3px solid #555; margin: 0 0 22px; padding-bottom: 14px; }
-    label { display: block; font-weight: 700; margin: 14px 0 6px; }
-    .input { border: 2px solid #777; height: 48px; }
-    .row { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
-    .button { background: #444; color: white; font-weight: 800; margin-top: 22px; padding: 16px; text-align: center; }
-    .message { background: #e0e0e0; border: 2px solid #777; margin-bottom: 18px; padding: 16px; }
-    .card { border: 2px solid #777; margin-top: 14px; padding: 18px; }
-    .tag { background: #444; color: white; display: inline-block; padding: 6px 10px; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#ddd; color:#222; font:14px/1.35 "Microsoft JhengHei",sans-serif; overflow:hidden; }
+    .frame { width:1248px; height:688px; margin:16px; background:#f7f7f7; border:3px solid #333; }
+    header { height:64px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; border-bottom:3px solid #333; background:#fff; }
+    header strong { font-size:20px; }
+    .layout { display:grid; grid-template-columns:210px 1fr; height:618px; }
+    aside { padding:17px 14px; border-right:3px solid #333; background:#ececec; }
+    .label { margin-bottom:8px; color:#555; font-size:12px; font-weight:800; }
+    .nav { margin:7px 0; padding:9px 10px; border:2px solid #555; background:#fff; }
+    .nav.active { background:#ccc; font-weight:800; }
+    .role { margin-top:20px; padding:12px; border:2px solid #555; background:#fff; }
+    .role b { display:block; margin:6px 0; padding:6px; background:#444; color:#fff; }
+    main { padding:16px 18px; }
+    h1 { margin:0 0 4px; font-size:24px; }
+    .subtitle { margin:0 0 12px; color:#555; }
+    .tasks { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px; }
+    .task { padding:9px 11px; border:2px solid #555; background:#fff; }
+    .task b { display:block; }
+    .workspace { display:grid; grid-template-columns:1.2fr .8fr; gap:12px; }
+    .panel { height:432px; border:3px solid #333; background:#fff; }
+    .panel h2 { margin:0; padding:10px 12px; border-bottom:2px solid #555; font-size:17px; }
+    .form { display:grid; grid-template-columns:1fr 1fr; gap:8px 10px; padding:11px 12px; }
+    label { font-size:11px; font-weight:800; }
+    .wide { grid-column:1/-1; }
+    .input { height:28px; margin-top:3px; border:2px solid #777; background:#f6f6f6; }
+    .textarea { height:45px; }
+    .hint { margin-top:3px; color:#666; font-size:9px; }
+    .actions { grid-column:1/-1; display:flex; justify-content:flex-end; gap:7px; }
+    .button { padding:7px 12px; border:2px solid #444; background:#fff; font-weight:800; }
+    .button.primary { background:#444; color:#fff; }
+    .message { margin:0 12px; padding:8px 10px; border:2px dashed #666; background:#e4e4e4; font-size:11px; }
+    .list { padding:5px 11px; }
+    .card { margin-top:8px; padding:10px; border:2px solid #777; }
+    .card-top { display:flex; justify-content:space-between; align-items:center; }
+    .status { padding:4px 7px; border:2px solid #444; background:#ddd; font-size:10px; font-weight:800; }
+    .meta { display:grid; grid-template-columns:1fr 1fr; gap:3px; margin-top:7px; color:#555; font-size:10px; }
+    .legend { margin:8px 11px; padding:7px; border:2px dashed #777; font-size:10px; }
   </style>
 </head>
 <body>
-  <main>
-    <h1>低擬真線框圖｜社團幹部建立申請與查看狀態</h1>
-    <div class="roles"><div>社團幹部</div><div>課外活動組</div><div>場地管理員</div><div>一般學生</div></div>
-    <section class="screen">
-      <div class="box">
-        <h2>建立活動申請</h2>
-        <label>活動名稱 *</label><div class="input"></div>
-        <div class="row"><div><label>日期 *</label><div class="input"></div></div><div><label>場地 *</label><div class="input"></div></div></div>
-        <div class="row"><div><label>開始時間 *</label><div class="input"></div></div><div><label>結束時間 *</label><div class="input"></div></div></div>
-        <label>活動說明</label><div class="input" style="height:100px"></div>
-        <div class="button">檢查並送出申請</div>
-      </div>
-      <div class="box">
-        <h2>我的申請與狀態</h2>
-        <div class="message">系統回饋／錯誤／處理中</div>
-        <div class="card"><span class="tag">待審核</span><h3>活動名稱</h3><p>日期・時間・場地・版本</p></div>
-        <div class="card"><span class="tag">待補件</span><h3>活動名稱</h3><p>補件原因與修改入口</p></div>
-      </div>
-    </section>
-  </main>
+  <div class="frame">
+    <header><strong>校園社團活動與場地管理平台</strong><span>Low-fidelity wireframe · UI-01 / UI-02 / UI-03</span></header>
+    <div class="layout">
+      <aside>
+        <div class="label">主要功能</div>
+        <div class="nav active">活動與場地申請</div>
+        <div class="nav">我的申請與進度</div>
+        <div class="nav">審核工作台</div>
+        <div class="nav">已核准活動</div>
+        <div class="role"><strong>目前角色</strong><b>社團幹部</b><small>可切換為課外活動組，查看不同權限畫面。</small></div>
+      </aside>
+      <main>
+        <h1>完成活動與場地申請</h1>
+        <p class="subtitle">以三個核心任務驗證表單、衝突處理與審核狀態。</p>
+        <div class="tasks">
+          <div class="task"><b>01 建立申請</b>填寫活動、時間與場地後送出。</div>
+          <div class="task"><b>02 解決衝突</b>理解衝突原因並調整資料。</div>
+          <div class="task"><b>03 補件與審核</b>切換角色完成補件、重送與核准。</div>
+        </div>
+        <div class="workspace">
+          <section class="panel">
+            <h2>活動申請表｜步驟 1／2</h2>
+            <div class="form">
+              <label class="wide">活動名稱<div class="input"></div></label>
+              <label>活動日期<div class="input"></div></label><label>預估人數<div class="input"></div></label>
+              <label>開始時間<div class="input"></div></label><label>結束時間<div class="input"></div></label>
+              <label class="wide">場地名稱<div class="input"></div><div class="hint">直接輸入或從建議清單選擇，例如：活動中心 R201</div></label>
+              <label class="wide">活動說明<div class="input textarea"></div></label>
+              <div class="actions"><span class="button">清除</span><span class="button primary">檢查並送出</span></div>
+            </div>
+            <div class="message">系統訊息／衝突原因／送出成功顯示區，並提供下一步。</div>
+          </section>
+          <section class="panel">
+            <h2>我的申請｜2 筆</h2>
+            <div class="list">
+              <div class="card"><div class="card-top"><strong>迎新說明會</strong><span class="status">待審核</span></div><div class="meta"><span>8/18 14:00–16:00</span><span>體育館會議室</span><span>申請編號 A-1024</span><span>等待行政確認</span></div></div>
+              <div class="card"><div class="card-top"><strong>攝影工作坊</strong><span class="status">已核准</span></div><div class="meta"><span>8/15 13:00–15:00</span><span>活動中心 R201</span><span>申請編號 A-1019</span><span>可查看活動頁</span></div></div>
+            </div>
+            <div class="legend">狀態圖例：待審核／待補件／已核准</div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
 </body>
 </html>

@@ -7,4 +7,4 @@
 | 修改範圍 | Prototype.tsx、prototype-domain.mjs、globals.css、page.tsx、layout.tsx、前端測試、Java ApplicationService 與測試 |
 | 可操作起點 | 網站「操作驗證」區，先載入匿名測試資料 |
 | 可觀察結果 | 三個任務可操作；六類狀態可見；非法回轉被拒絕；測試結果可重現 |
-| 已知限制 | 瀏覽器／Java 記憶體資料；無正式登入、資料庫及外部通知；真人可用性測試待執行 |
+| 已知限制 | 瀏覽器／Java 記憶體資料；無正式登入、資料庫及外部通知；第一輪真人測試任務與原 UT-02、UT-03 不一致，仍需補測與重測 |
