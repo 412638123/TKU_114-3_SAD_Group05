@@ -51,4 +51,4 @@
 
 | 提交識別 | 內容 | 對應任務／問題 | 測試證據 | 文件連結 |
 | --- | --- | --- | --- | --- |
-| 基準 59fa6ff；成果提交識別於最終驗證後回填 | 0728–0729 介面重構、測試、流程圖、文件與證據 | TF-01～TF-03、U-01～U-11 | evidence/functional、evidence/before_after | 本資料夾與 ../midterm-report-site |
+| 0d92ce6（基準 59fa6ff） | 0728–0729 介面重構、測試、流程圖、文件與證據 | TF-01～TF-03、U-01～U-11 | evidence/functional、evidence/before_after | 本資料夾與 ../midterm-report-site |
